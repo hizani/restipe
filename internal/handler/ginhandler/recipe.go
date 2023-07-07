@@ -1,12 +1,19 @@
 package ginhandler
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 func (h *GinHandler) createRecipe(c *gin.Context) {
 
 }
 
 func (h *GinHandler) getAllRecipe(c *gin.Context) {
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"aboba": "aboba",
+	})
 
 }
 

@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't initialize storage: %s", err.Error())
 	}
-	service := service.New(storage)
+	service := service.New(storage, viper.GetString("jwttoken"))
 	handler := handler.NewGinHandler(service)
 
 	server := server.New(viper.GetString("port"), handler)

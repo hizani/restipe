@@ -8,7 +8,8 @@ import (
 
 type Authorization interface {
 	SignupUser(user model.SignupUser) (int, error)
-	SigninUser(user model.SigninUser) (int, error)
+	SigninUser(user model.SigninUser) (string, error)
+	Authorize(token string) (int, error)
 }
 
 type Recipe interface {
@@ -19,8 +20,8 @@ type Service struct {
 	Recipe
 }
 
-func New(storage *storage.Storage) *Service {
+func New(storage *storage.Storage, jwttoken string) *Service {
 	return &Service{
-		Authorization: recipeservice.NewAuthService(storage),
+		Authorization: recipeservice.NewAuthService(storage, jwttoken),
 	}
 }

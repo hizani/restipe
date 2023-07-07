@@ -1,5 +1,6 @@
 port: "8000"
 
+jwttoken: "_yourprivatejwttoken_"
 db:
     username: "postgres"
     password: "postgres"
