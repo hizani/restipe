@@ -10,7 +10,7 @@ func (h *GinHandler) createRecipe(c *gin.Context) {
 
 }
 
-func (h *GinHandler) getAllRecipe(c *gin.Context) {
+func (h *GinHandler) getAllRecipes(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"aboba": "aboba",
 	})

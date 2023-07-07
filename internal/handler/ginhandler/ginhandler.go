@@ -22,30 +22,44 @@ func New(service *service.Service) *GinHandler {
 		auth.POST("/signin", h.signIn)
 	}
 
-	api := router.Group("/api", h.Authorize)
+	api := router.Group("/api")
 	{
 		recipes := api.Group("/recipes")
 		{
-			recipes.POST("/", h.createRecipe)
-			recipes.GET("/", h.getAllRecipe)
+			recipes.GET("/", h.getAllRecipes)
 			recipes.GET("/:id", h.getRecipeById)
-			recipes.PUT("/:id", h.updateRecipe)
-			recipes.DELETE("/:id", h.deleteRecipe)
 
 			ingredients := recipes.Group(":id/ingredients")
 			{
-				ingredients.POST("/", h.createIngredient)
 				ingredients.GET("/", h.getAllIngredients)
-				ingredients.DELETE("/:id", h.deleteIngredient)
 			}
 
 			steps := recipes.Group(":id/steps")
 			{
-				steps.POST("/", h.addStep)
 				steps.GET("/", h.getAllSteps)
-				steps.DELETE("/:id", h.deleteStep)
 			}
+
+			auth := recipes.Group("/", h.Authorize)
+			{
+				auth.POST("/", h.createRecipe)
+				auth.PUT("/:id", h.updateRecipe)
+				recipes.DELETE("/:id", h.deleteRecipe)
+
+				ingredients := auth.Group(":id/ingredients")
+				{
+					ingredients.POST("/", h.createIngredient)
+					ingredients.DELETE("/:id", h.deleteIngredient)
+				}
+
+				steps := auth.Group(":id/steps")
+				{
+					steps.POST("/", h.addStep)
+					steps.DELETE("/:id", h.deleteStep)
+				}
+			}
+
 		}
+
 	}
 	return h
 }
