@@ -15,8 +15,13 @@ CREATE TABLE recipe (
 
 CREATE TABLE ingredient (
   "id" serial primary key,
+  "name" varchar(64)
+);
+
+CREATE TABLE ingredient_recipe (
+  "id" serial primary key,
   "recipe_id" int references recipe(id) on delete cascade,
-  "name" varchar(64) ,
+  "ingredient_id" int references ingredient(id) on delete cascade,
   "quantity" smallint
 );
 
@@ -26,6 +31,6 @@ CREATE TABLE step (
   "recipe_id" int references recipe(id) on delete cascade,
   "number" int,
   "description" text,
-  "duration" interva second(0)
+  "duration" interval second(0)
 );
 
