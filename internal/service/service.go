@@ -13,6 +13,7 @@ type Authorization interface {
 }
 
 type Recipe interface {
+	Create(userId int, recipe model.CreateRecipe) (int, error)
 }
 
 type Service struct {
@@ -22,6 +23,7 @@ type Service struct {
 
 func New(storage *storage.Storage, jwttoken string) *Service {
 	return &Service{
-		Authorization: recipeservice.NewAuthService(storage, jwttoken),
+		Authorization: recipeservice.NewAuthService(storage.Authorization, jwttoken),
+		Recipe:        recipeservice.NewRecipeService(storage.Recipe),
 	}
 }

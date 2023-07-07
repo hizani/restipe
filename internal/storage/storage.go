@@ -12,6 +12,7 @@ type Authorization interface {
 }
 
 type Recipe interface {
+	Create(userId int, recipe model.CreateRecipe) (int, error)
 }
 
 type Storage struct {
@@ -26,5 +27,6 @@ func NewPostgres(cfg sqldb.Config) (*Storage, error) {
 	}
 	return &Storage{
 		Authorization: postgres.NewAuthStoarge(db),
+		Recipe:        postgres.NewRecipeStorage(db),
 	}, err
 }

@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	userCtx = "userId"
+)
+
 type GinHandler struct {
 	http.Handler
 	service *service.Service

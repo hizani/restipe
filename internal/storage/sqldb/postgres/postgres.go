@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	userTable       = "\"user\""
-	recipeTable     = "\"recipe\""
-	ingredientTable = "\"ingredient\""
-	stepTable       = "\"step\""
+	userTable             = "\"user\""
+	recipeTable           = "\"recipe\""
+	ingredientTable       = "\"ingredient\""
+	ingredientRecipeTable = "\"ingredient_recipe\""
+	stepTable             = "\"step\""
 )
 
 func New(cfg sqldb.Config) (*sqlx.DB, error) {

@@ -57,5 +57,5 @@ func (h *GinHandler) Authorize(c *gin.Context) {
 		newErrorResponce(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	c.Set("userId", userId)
+	c.Set(userCtx, userId)
 }
