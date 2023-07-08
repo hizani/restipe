@@ -57,7 +57,7 @@ func New(service *service.Service) *GinHandler {
 
 				steps := auth.Group(":id/steps")
 				{
-					steps.POST("/", h.addStep)
+					steps.POST("/", h.addStepToRecipe)
 					steps.DELETE("/:id", h.deleteStep)
 				}
 			}

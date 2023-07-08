@@ -32,3 +32,8 @@ func (r *RecipeService) GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingre
 func (r *RecipeService) GetAllStepsFromRecipe(recipeId int) ([]model.Step, error) {
 	return r.storage.GetAllStepsFromRecipe(recipeId)
 }
+
+func (r *RecipeService) AddStepToRecipe(userId, recipeId int, step model.AddStepReq) (int, error) {
+	return r.storage.AddStepToRecipe(userId, recipeId, step)
+
+}

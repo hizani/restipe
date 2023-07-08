@@ -1,10 +1,11 @@
 package postgres
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"restipe/internal/model"
 	"strings"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -65,9 +66,8 @@ func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipeReq) (int, e
 			return 0, err
 		}
 		for i, v := range recipe.Steps {
-			duration := time.Duration(v.Duration) * time.Second
 			createSteps.WriteString(
-				fmt.Sprintf("(%d, %d, '%s', '%ds')", id, i+1, v.Description, int64(duration.Seconds())),
+				fmt.Sprintf("(%d, %d, '%s', '%ds')", id, i+1, v.Description, v.Duration),
 			)
 			if i < len(recipe.Steps)-1 {
 				createSteps.WriteString(", ")
@@ -156,4 +156,52 @@ func (r *RecipeStorage) GetAllStepsFromRecipe(recipeId int) ([]model.Step, error
 		"FROM %s s WHERE s.recipe_id = $1", stepTable)
 	err := r.db.Select(&steps, query, recipeId)
 	return steps, err
+}
+
+func (r *RecipeStorage) AddStepToRecipe(userId int, recipeId int, step model.AddStepReq) (int, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+
+	var id int
+
+	var author int
+	SelectRecipeAuthor := fmt.Sprintf(
+		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
+		userTable, recipeTable,
+	)
+	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
+	if err := row.Scan(&author); err != nil {
+		if err != sql.ErrNoRows {
+			tx.Rollback()
+			return 0, err
+		}
+		return 0, errors.New("wrong author")
+	}
+
+	var maxNumber int
+	SelectMaxNumQuery := fmt.Sprintf(
+		"SELECT number FROM %s WHERE recipe_id = $1 ORDER BY number DESC LIMIT 1", stepTable,
+	)
+	row = tx.QueryRow(SelectMaxNumQuery, recipeId)
+	if err := row.Scan(&maxNumber); err != nil {
+		if err != sql.ErrNoRows {
+			tx.Rollback()
+			return 0, err
+		}
+	}
+
+	InsertStepQuery := fmt.Sprintf(
+		"INSERT INTO %s (recipe_id, number, description, duration) VALUES ($1, $2, $3, $4) RETURNING id",
+		stepTable,
+	)
+	row = tx.QueryRow(InsertStepQuery, recipeId, maxNumber+1, step.Description, fmt.Sprintf("%ds", step.Duration))
+	if err := row.Scan(&id); err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	tx.Commit()
+	return id, nil
 }
