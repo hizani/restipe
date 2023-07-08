@@ -17,6 +17,11 @@ func (r *RecipeService) Create(userId int, recipe model.CreateRecipeReq) (int, e
 	return r.storage.Create(userId, recipe)
 }
 
+func (r *RecipeService) Delete(userId, recipeId int) error {
+	return r.storage.Delete(userId, recipeId)
+
+}
+
 func (r *RecipeService) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error) {
 	return r.storage.GetAll(recipe)
 }
@@ -44,4 +49,8 @@ func (r *RecipeService) RemoveStepFromRecipe(userId, recipeId, stepId int) error
 
 func (r *RecipeService) RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error {
 	return r.storage.RemoveIngredientFromRecipe(userId, recipeId, ingredientId)
+}
+
+func (r *RecipeService) AddIngredientToRecipe(userId int, recipeId int, ingredient model.AddIngredientReq) (int, error) {
+	return r.storage.AddIngredientToRecipe(userId, recipeId, ingredient)
 }

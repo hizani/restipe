@@ -13,11 +13,13 @@ type Authorization interface {
 
 type Recipe interface {
 	Create(userId int, recipe model.CreateRecipeReq) (int, error)
+	Delete(userId, recipeId int) error
 	GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error)
 	GetById(recipeId int) (model.Recipe, error)
 	GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error)
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
 	AddStepToRecipe(userId, recipeId int, step model.AddStepReq) (int, error)
+	AddIngredientToRecipe(userId, recipeId int, ingredient model.AddIngredientReq) (int, error)
 	RemoveStepFromRecipe(userId, recipeId, stepId int) error
 	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
 }

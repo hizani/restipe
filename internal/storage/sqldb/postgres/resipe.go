@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"restipe/internal/model"
 	"strings"
@@ -82,6 +81,39 @@ func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipeReq) (int, e
 	}
 
 	return id, tx.Commit()
+}
+
+func (r *RecipeStorage) Delete(userId, recipeId int) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	var author int
+	SelectRecipeAuthor := fmt.Sprintf(
+		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
+		userTable, recipeTable,
+	)
+	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
+	if err := row.Scan(&author); err != nil {
+		if err != sql.ErrNoRows {
+			tx.Rollback()
+			return err
+		}
+		return nil
+	}
+
+	DeleteRecipeQuery := fmt.Sprintf(
+		"DELETE FROM %s WHERE id = $1",
+		recipeTable,
+	)
+
+	if _, err = tx.Exec(DeleteRecipeQuery, recipeId); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error) {
@@ -177,7 +209,7 @@ func (r *RecipeStorage) AddStepToRecipe(userId int, recipeId int, step model.Add
 			tx.Rollback()
 			return 0, err
 		}
-		return 0, errors.New("wrong author")
+		return 0, nil
 	}
 
 	var maxNumber int
@@ -205,6 +237,41 @@ func (r *RecipeStorage) AddStepToRecipe(userId int, recipeId int, step model.Add
 	return id, tx.Commit()
 }
 
+func (r *RecipeStorage) AddIngredientToRecipe(userId int, recipeId int, ingredient model.AddIngredientReq) (int, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+
+	var id int
+
+	var author int
+	SelectRecipeAuthor := fmt.Sprintf(
+		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
+		userTable, recipeTable,
+	)
+	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
+	if err := row.Scan(&author); err != nil {
+		if err != sql.ErrNoRows {
+			tx.Rollback()
+			return 0, err
+		}
+		return 0, nil
+	}
+
+	InsertIngredientQuery := fmt.Sprintf(
+		"INSERT INTO %s (recipe_id, ingredient_id, quantity) VALUES ($1, $2, $3) RETURNING id",
+		ingredientRecipeTable,
+	)
+	row = tx.QueryRow(InsertIngredientQuery, recipeId, ingredient.IngredientId, ingredient.Quantity)
+	if err := row.Scan(&id); err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	return id, tx.Commit()
+}
+
 func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -222,7 +289,7 @@ func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error
 			tx.Rollback()
 			return err
 		}
-		return errors.New("wrong author")
+		return nil
 	}
 
 	var number int
@@ -275,7 +342,7 @@ func (r *RecipeStorage) RemoveIngredientFromRecipe(userId, recipeId, ingredientI
 			tx.Rollback()
 			return err
 		}
-		return errors.New("wrong author")
+		return nil
 	}
 
 	RemoveIngredientQuery := fmt.Sprintf(

@@ -5,3 +5,8 @@ type Ingredient struct {
 	Name     string `json:"name" db:"name"`
 	Quantity int    `json:"quantity" binding:"required" db:"quantity"`
 }
+
+type AddIngredientReq struct {
+	IngredientId int `json:"ingredient_id" binding:"required"`
+	Quantity     int `json:"quantity" binding:"required"`
+}

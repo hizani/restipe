@@ -47,7 +47,7 @@ func New(service *service.Service) *GinHandler {
 			{
 				auth.POST("/", h.createRecipe)
 				auth.PUT("/:id", h.updateRecipe)
-				recipes.DELETE("/:id", h.deleteRecipe)
+				auth.DELETE("/:id", h.deleteRecipe)
 
 				ingredients := auth.Group(":id/ingredients")
 				{
