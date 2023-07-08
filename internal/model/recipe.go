@@ -17,8 +17,8 @@ type GetRecipeReq struct {
 type CreateRecipeReq struct {
 	Name        string          `json:"name" binding:"required"`
 	Description string          `json:"description"`
-	Ingredients []Ingredient    `json:"ingredients" binding:"required"`
-	Steps       []CreateStepReq `json:"steps" binding:"required"`
+	Ingredients []Ingredient    `json:"ingredients"`
+	Steps       []CreateStepReq `json:"steps"`
 }
 
 type GetAllRecipesReq struct {
