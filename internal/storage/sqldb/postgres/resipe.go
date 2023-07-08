@@ -65,9 +65,9 @@ func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipeReq) (int, e
 			return 0, err
 		}
 		for i, v := range recipe.Steps {
-
+			duration := time.Duration(v.Duration) * time.Second
 			createSteps.WriteString(
-				fmt.Sprintf("(%d, %d, '%s', '%ds')", id, i+1, v.Description, int64(time.Duration(v.Duration).Seconds())),
+				fmt.Sprintf("(%d, %d, '%s', '%ds')", id, i+1, v.Description, int64(duration.Seconds())),
 			)
 			if i < len(recipe.Steps)-1 {
 				createSteps.WriteString(", ")
@@ -147,4 +147,13 @@ func (r *RecipeStorage) GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingre
 		"JOIN %s ir ON ir.ingredient_id = i.id WHERE ir.recipe_id = $1", ingredientTable, ingredientRecipeTable)
 	err := r.db.Select(&ingredients, query, recipeId)
 	return ingredients, err
+}
+
+func (r *RecipeStorage) GetAllStepsFromRecipe(recipeId int) ([]model.Step, error) {
+	var steps []model.Step
+
+	query := fmt.Sprintf("SELECT s.id, s.number, s.description, EXTRACT(EPOCH FROM s.duration)::int duration "+
+		"FROM %s s WHERE s.recipe_id = $1", stepTable)
+	err := r.db.Select(&steps, query, recipeId)
+	return steps, err
 }

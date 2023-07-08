@@ -40,7 +40,7 @@ func New(service *service.Service) *GinHandler {
 
 			steps := recipes.Group(":id/steps")
 			{
-				steps.GET("/", h.getAllSteps)
+				steps.GET("/", h.getAllStepsFromRecipe)
 			}
 
 			auth := recipes.Group("/", h.Authorize)

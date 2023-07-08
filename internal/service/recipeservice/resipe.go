@@ -28,3 +28,7 @@ func (r *RecipeService) GetById(recipeId int) (model.Recipe, error) {
 func (r *RecipeService) GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error) {
 	return r.storage.GetAllIngredientsFromRecipe(recipeId)
 }
+
+func (r *RecipeService) GetAllStepsFromRecipe(recipeId int) ([]model.Step, error) {
+	return r.storage.GetAllStepsFromRecipe(recipeId)
+}

@@ -17,6 +17,7 @@ type Recipe interface {
 	GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error)
 	GetById(recipeId int) (model.Recipe, error)
 	GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error)
+	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
 }
 
 type Service struct {

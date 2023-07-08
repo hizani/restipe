@@ -7,3 +7,10 @@ type CreateStepReq struct {
 	Description string `json:"description" binding:"required" db:"description"`
 	Duration    int64  `json:"duration" binding:"required" db:"duration"`
 }
+
+type Step struct {
+	Id          int    `json:"id" db:"id"`
+	Number      int    `json:"number" db:"number"`
+	Description string `json:"descriprion" db:"description"`
+	Duration    int64  `json:"duration" db:"duration"`
+}
