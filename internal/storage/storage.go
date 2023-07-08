@@ -18,6 +18,7 @@ type Recipe interface {
 	GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error)
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
 	AddStepToRecipe(userId, recipeId int, step model.AddStepReq) (int, error)
+	RemoveStepFromRecipe(userId, recipeId, stepId int) error
 }
 
 type Storage struct {

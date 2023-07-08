@@ -202,6 +202,37 @@ func (r *RecipeStorage) AddStepToRecipe(userId int, recipeId int, step model.Add
 		return 0, err
 	}
 
-	tx.Commit()
-	return id, nil
+	return id, tx.Commit()
+}
+
+func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	var author int
+	SelectRecipeAuthor := fmt.Sprintf(
+		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
+		userTable, recipeTable,
+	)
+	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
+	if err := row.Scan(&author); err != nil {
+		if err != sql.ErrNoRows {
+			tx.Rollback()
+			return err
+		}
+		return errors.New("wrong author")
+	}
+
+	RemoveStepQuery := fmt.Sprintf(
+		"DELETE FROM %s WHERE recipe_id = $1 AND id = $2",
+		stepTable,
+	)
+	if _, err := tx.Exec(RemoveStepQuery, recipeId, stepId); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+
 }

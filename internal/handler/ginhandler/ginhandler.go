@@ -52,13 +52,13 @@ func New(service *service.Service) *GinHandler {
 				ingredients := auth.Group(":id/ingredients")
 				{
 					ingredients.POST("/", h.addIngredientToRecipe)
-					ingredients.DELETE("/:id", h.removeIngredientFromRecipe)
+					ingredients.DELETE("/:ingid", h.removeIngredientFromRecipe)
 				}
 
 				steps := auth.Group(":id/steps")
 				{
 					steps.POST("/", h.addStepToRecipe)
-					steps.DELETE("/:id", h.deleteStep)
+					steps.DELETE("/:stepid", h.removeStepFromRecipe)
 				}
 			}
 

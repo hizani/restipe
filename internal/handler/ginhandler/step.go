@@ -50,4 +50,29 @@ func (h *GinHandler) getAllStepsFromRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, ingredients)
 }
 
-func (h *GinHandler) deleteStep(c *gin.Context) {}
+func (h *GinHandler) removeStepFromRecipe(c *gin.Context) {
+	userId := c.GetInt(userCtx)
+	if userId == 0 {
+		newErrorResponse(c, http.StatusInternalServerError, "user id not found")
+		return
+	}
+
+	recipeId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	stepId, err := strconv.Atoi(c.Param("stepid"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.service.Recipe.RemoveStepFromRecipe(userId, recipeId, stepId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{})
+}
