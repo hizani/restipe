@@ -53,9 +53,3 @@ func (h *GinHandler) updateRecipe(c *gin.Context) {
 func (h *GinHandler) deleteRecipe(c *gin.Context) {
 
 }
-
-func (h *GinHandler) getAllUserRecipes(c *gin.Context) {
-
-}
-
-func (h *GinHandler) getRecipesWithIngredients(c *gin.Context) {}
