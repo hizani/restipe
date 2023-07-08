@@ -15,6 +15,7 @@ type Authorization interface {
 type Recipe interface {
 	Create(userId int, recipe model.CreateRecipeReq) (int, error)
 	GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error)
+	GetById(recipeId int) (model.Recipe, error)
 }
 
 type Service struct {

@@ -20,3 +20,7 @@ func (r *RecipeService) Create(userId int, recipe model.CreateRecipeReq) (int, e
 func (r *RecipeService) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error) {
 	return r.storage.GetAll(recipe)
 }
+
+func (r *RecipeService) GetById(recipeId int) (model.Recipe, error) {
+	return r.storage.GetById(recipeId)
+}

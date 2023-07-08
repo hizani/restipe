@@ -3,6 +3,7 @@ package ginhandler
 import (
 	"net/http"
 	"restipe/internal/model"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,6 +44,18 @@ func (h *GinHandler) getAllRecipes(c *gin.Context) {
 }
 
 func (h *GinHandler) getRecipeById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	recipe, err := h.service.Recipe.GetById(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, recipe)
 
 }
 

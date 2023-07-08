@@ -132,3 +132,10 @@ func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, e
 
 	return recipes, err
 }
+
+func (r *RecipeStorage) GetById(recipeId int) (model.Recipe, error) {
+	var recipe model.Recipe
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", recipeTable)
+	err := r.db.Get(&recipe, query, recipeId)
+	return recipe, err
+}
