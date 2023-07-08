@@ -35,7 +35,7 @@ func New(service *service.Service) *GinHandler {
 
 			ingredients := recipes.Group(":id/ingredients")
 			{
-				ingredients.GET("/", h.getAllIngredients)
+				ingredients.GET("/", h.getAllIngredientsFromRecipe)
 			}
 
 			steps := recipes.Group(":id/steps")
@@ -51,8 +51,8 @@ func New(service *service.Service) *GinHandler {
 
 				ingredients := auth.Group(":id/ingredients")
 				{
-					ingredients.POST("/", h.createIngredient)
-					ingredients.DELETE("/:id", h.deleteIngredient)
+					ingredients.POST("/", h.addIngredientToRecipe)
+					ingredients.DELETE("/:id", h.removeIngredientFromRecipe)
 				}
 
 				steps := auth.Group(":id/steps")

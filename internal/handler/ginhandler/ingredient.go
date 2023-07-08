@@ -1,15 +1,31 @@
 package ginhandler
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+	"strconv"
 
-func (h *GinHandler) createIngredient(c *gin.Context) {
+	"github.com/gin-gonic/gin"
+)
+
+func (h *GinHandler) addIngredientToRecipe(c *gin.Context) {
 
 }
 
-func (h *GinHandler) getAllIngredients(c *gin.Context) {
+func (h *GinHandler) getAllIngredientsFromRecipe(c *gin.Context) {
+	recipeId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
+	ingredients, err := h.service.Recipe.GetAllIngredientsFromRecipe(recipeId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, ingredients)
 }
 
-func (h *GinHandler) deleteIngredient(c *gin.Context) {
+func (h *GinHandler) removeIngredientFromRecipe(c *gin.Context) {
 
 }

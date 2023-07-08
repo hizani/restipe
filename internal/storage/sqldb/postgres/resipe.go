@@ -139,3 +139,12 @@ func (r *RecipeStorage) GetById(recipeId int) (model.Recipe, error) {
 	err := r.db.Get(&recipe, query, recipeId)
 	return recipe, err
 }
+
+func (r *RecipeStorage) GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error) {
+	var ingredients []model.Ingredient
+
+	query := fmt.Sprintf("SELECT i.*, ir.quantity FROM %s i "+
+		"JOIN %s ir ON ir.ingredient_id = i.id WHERE ir.recipe_id = $1", ingredientTable, ingredientRecipeTable)
+	err := r.db.Select(&ingredients, query, recipeId)
+	return ingredients, err
+}
