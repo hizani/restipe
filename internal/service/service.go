@@ -19,8 +19,8 @@ type Recipe interface {
 	GetById(recipeId int) (model.Recipe, error)
 	GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error)
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
-
 	RemoveStepFromRecipe(userId, recipeId, stepId int) error
+	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
 }
 
 type Service struct {

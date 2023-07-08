@@ -41,3 +41,7 @@ func (r *RecipeService) AddStepToRecipe(userId, recipeId int, step model.AddStep
 func (r *RecipeService) RemoveStepFromRecipe(userId, recipeId, stepId int) error {
 	return r.storage.RemoveStepFromRecipe(userId, recipeId, stepId)
 }
+
+func (r *RecipeService) RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error {
+	return r.storage.RemoveIngredientFromRecipe(userId, recipeId, ingredientId)
+}

@@ -257,3 +257,35 @@ func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error
 	return tx.Commit()
 
 }
+
+func (r *RecipeStorage) RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	var author int
+	SelectRecipeAuthor := fmt.Sprintf(
+		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
+		userTable, recipeTable,
+	)
+	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
+	if err := row.Scan(&author); err != nil {
+		if err != sql.ErrNoRows {
+			tx.Rollback()
+			return err
+		}
+		return errors.New("wrong author")
+	}
+
+	RemoveIngredientQuery := fmt.Sprintf(
+		"DELETE FROM %s WHERE recipe_id = $1 AND ingredient_id = $2",
+		ingredientRecipeTable,
+	)
+	if _, err := tx.Exec(RemoveIngredientQuery, recipeId, ingredientId); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+
+}
