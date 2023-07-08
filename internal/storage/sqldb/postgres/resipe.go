@@ -225,6 +225,27 @@ func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error
 		return errors.New("wrong author")
 	}
 
+	var number int
+	GetRemovedNumber := fmt.Sprintf(
+		"SELECT number FROM %s WHERE recipe_id = $1 AND id = $2",
+		stepTable,
+	)
+	row = tx.QueryRow(GetRemovedNumber, recipeId, stepId)
+	if err := row.Scan(&number); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	UpdateStepsNumber := fmt.Sprintf(
+		"UPDATE %s SET number = number - 1 WHERE number > $1",
+		stepTable,
+	)
+
+	if _, err := tx.Exec(UpdateStepsNumber, number); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	RemoveStepQuery := fmt.Sprintf(
 		"DELETE FROM %s WHERE recipe_id = $1 AND id = $2",
 		stepTable,
