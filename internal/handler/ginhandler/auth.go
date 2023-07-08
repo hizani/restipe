@@ -9,7 +9,7 @@ import (
 )
 
 func (h *GinHandler) signUp(c *gin.Context) {
-	var input model.SignupUser
+	var input model.SignupUserReq
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponce(c, http.StatusBadRequest, err.Error())
@@ -25,7 +25,7 @@ func (h *GinHandler) signUp(c *gin.Context) {
 }
 
 func (h *GinHandler) signIn(c *gin.Context) {
-	var input model.SigninUser
+	var input model.SigninUserReq
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponce(c, http.StatusBadRequest, err.Error())

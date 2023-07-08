@@ -17,7 +17,7 @@ func NewRecipeStorage(db *sqlx.DB) *RecipeStorage {
 	return &RecipeStorage{db}
 }
 
-func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipe) (int, error) {
+func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipeReq) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -82,4 +82,53 @@ func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipe) (int, erro
 	}
 
 	return id, tx.Commit()
+}
+
+func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error) {
+	recipes := []model.Recipe{}
+	query := strings.Builder{}
+	query.Grow(256)
+	query.WriteString("SELECT rd.id, rd.name, rd.description, rd.author  FROM ")
+	recipeQuery := fmt.Sprintf("SELECT * FROM %s", recipeTable)
+	groupBy := "GROUP BY rd.id, rd.name, rd.description, rd.author "
+
+	durationSort := strings.ToUpper(recipe.DurationSort)
+	if durationSort == "ASC" || durationSort == "DESC" {
+		recipeQuery = fmt.Sprintf("SELECT r.*, SUM(st.duration) dur FROM %s r "+
+			"JOIN %s st on st.recipe_id  = r.id GROUP BY r.id",
+			recipeTable, stepTable,
+		)
+		groupBy = "GROUP BY rd.id, rd.name, rd.description, rd.author, rd.dur "
+	}
+	query.WriteString(fmt.Sprintf("(%s) rd ", recipeQuery))
+
+	havingIngredients := ""
+	if len(recipe.IngredientFilter) != 0 {
+		query.WriteString(
+			fmt.Sprintf("JOIN %s ir ON rd.id = ir.recipe_id AND ir.ingredient_id in (",
+				ingredientRecipeTable,
+			),
+		)
+		for i, v := range recipe.IngredientFilter {
+			query.WriteString(fmt.Sprintf("%d", v))
+			if i != len(recipe.IngredientFilter)-1 {
+				query.WriteString(",")
+			}
+		}
+		query.WriteString(") ")
+		havingIngredients = fmt.Sprintf("HAVING COUNT(ir.ingredient_id) = %d ", len(recipe.IngredientFilter))
+	}
+	if recipe.Author != 0 {
+		query.WriteString(fmt.Sprintf("WHERE rd.author = %d ", recipe.Author))
+	}
+
+	query.WriteString(groupBy)
+	query.WriteString(havingIngredients)
+	if durationSort == "ASC" || durationSort == "DESC" {
+		query.WriteString(fmt.Sprintf("ORDER BY rd.dur %s", durationSort))
+	}
+
+	err := r.db.Select(&recipes, query.String())
+
+	return recipes, err
 }

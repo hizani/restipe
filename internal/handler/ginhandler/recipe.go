@@ -14,7 +14,7 @@ func (h *GinHandler) createRecipe(c *gin.Context) {
 		return
 	}
 
-	var input model.CreateRecipe
+	var input model.CreateRecipeReq
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponce(c, http.StatusBadRequest, err.Error())
 		return
@@ -28,9 +28,17 @@ func (h *GinHandler) createRecipe(c *gin.Context) {
 }
 
 func (h *GinHandler) getAllRecipes(c *gin.Context) {
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"aboba": "aboba",
-	})
+	var input model.GetAllRecipesReq
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponce(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	recipes, err := h.service.Recipe.GetAll(input)
+	if err != nil {
+		newErrorResponce(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, recipes)
 
 }
 
@@ -45,3 +53,9 @@ func (h *GinHandler) updateRecipe(c *gin.Context) {
 func (h *GinHandler) deleteRecipe(c *gin.Context) {
 
 }
+
+func (h *GinHandler) getAllUserRecipes(c *gin.Context) {
+
+}
+
+func (h *GinHandler) getRecipesWithIngredients(c *gin.Context) {}

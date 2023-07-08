@@ -7,12 +7,13 @@ import (
 )
 
 type Authorization interface {
-	SignupUser(user model.SignupUser) (int, error)
-	SigninUser(user model.SigninUser) (int, error)
+	SignupUser(user model.SignupUserReq) (int, error)
+	SigninUser(user model.SigninUserReq) (int, error)
 }
 
 type Recipe interface {
-	Create(userId int, recipe model.CreateRecipe) (int, error)
+	Create(userId int, recipe model.CreateRecipeReq) (int, error)
+	GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error)
 }
 
 type Storage struct {

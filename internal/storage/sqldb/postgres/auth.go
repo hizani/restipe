@@ -15,7 +15,7 @@ func NewAuthStoarge(db *sqlx.DB) *AuthStorage {
 	return &AuthStorage{db}
 }
 
-func (s *AuthStorage) SigninUser(user model.SigninUser) (int, error) {
+func (s *AuthStorage) SigninUser(user model.SigninUserReq) (int, error) {
 	var id int
 	query := fmt.Sprintf("SELECT id FROM %s WHERE login=$1 AND password_hash=$2", userTable)
 	err := s.db.Get(&id, query, user.Login, user.Password)
@@ -23,7 +23,7 @@ func (s *AuthStorage) SigninUser(user model.SigninUser) (int, error) {
 	return id, err
 }
 
-func (s *AuthStorage) SignupUser(user model.SignupUser) (int, error) {
+func (s *AuthStorage) SignupUser(user model.SignupUserReq) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (name, login, password_hash) values ($1, $2, $3) RETURNING id", userTable)
 	row := s.db.QueryRow(query, user.Name, user.Login, fmt.Sprintf("%s", user.Password))

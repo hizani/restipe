@@ -28,6 +28,10 @@ func New(service *service.Service) *GinHandler {
 
 	api := router.Group("/api")
 	{
+		users := api.Group("/users")
+		{
+			users.GET("/:id", h.getAllUserRecipes)
+		}
 		recipes := api.Group("/recipes")
 		{
 			recipes.GET("/", h.getAllRecipes)

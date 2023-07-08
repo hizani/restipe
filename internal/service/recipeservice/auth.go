@@ -19,7 +19,7 @@ func NewAuthService(storage storage.Authorization, jwttoken string) *AuthService
 	return &AuthService{storage, jwttoken}
 }
 
-func (s *AuthService) SignupUser(user model.SignupUser) (int, error) {
+func (s *AuthService) SignupUser(user model.SignupUserReq) (int, error) {
 	user.Password = hashPassword(user.Password)
 	return s.storage.SignupUser(user)
 }
@@ -29,7 +29,7 @@ type tokenClaimsWithId struct {
 	UserId int `json:"user_id"`
 }
 
-func (s *AuthService) SigninUser(user model.SigninUser) (string, error) {
+func (s *AuthService) SigninUser(user model.SigninUserReq) (string, error) {
 	user.Password = hashPassword(user.Password)
 	id, err := s.storage.SigninUser(user)
 	if err != nil {
