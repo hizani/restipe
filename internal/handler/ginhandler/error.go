@@ -10,6 +10,6 @@ func (ge *ginHandlerError) Error() string {
 	return ge.Message
 }
 
-func newErrorResponce(c *gin.Context, statusCode int, message string) {
+func newErrorResponse(c *gin.Context, statusCode int, message string) {
 	c.AbortWithStatusJSON(statusCode, ginHandlerError{message})
 }
