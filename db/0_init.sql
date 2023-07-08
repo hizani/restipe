@@ -22,7 +22,8 @@ CREATE TABLE ingredient_recipe (
   "id" serial primary key,
   "recipe_id" int references recipe(id) on delete cascade,
   "ingredient_id" int references ingredient(id) on delete cascade,
-  "quantity" smallint
+  "quantity" smallint,
+  UNIQUE("recipe_id", "ingredient_id")
 );
 
 
