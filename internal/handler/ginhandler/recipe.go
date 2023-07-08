@@ -60,7 +60,30 @@ func (h *GinHandler) getRecipeById(c *gin.Context) {
 }
 
 func (h *GinHandler) updateRecipe(c *gin.Context) {
+	userId := c.GetInt(userCtx)
+	if userId == 0 {
+		newErrorResponse(c, http.StatusInternalServerError, "user id not found")
+		return
+	}
 
+	recipeId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var input model.UpdateRecipeReq
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = h.service.Recipe.Update(userId, recipeId, input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
 func (h *GinHandler) deleteRecipe(c *gin.Context) {

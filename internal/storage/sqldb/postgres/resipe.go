@@ -165,6 +165,38 @@ func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, e
 	return recipes, err
 }
 
+func (r *RecipeStorage) Update(userId, recipeId int, recipe model.UpdateRecipeReq) error {
+	setValues := make([]string, 0, 2)
+	args := make([]interface{}, 0, 2)
+	argId := 1
+
+	if recipe.Name != nil {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, *recipe.Name)
+		argId++
+	}
+
+	if recipe.Description != nil {
+		setValues = append(setValues, fmt.Sprintf("description=$%d", argId))
+		args = append(args, *recipe.Description)
+		argId++
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE %s r SET %s WHERE r.id = $%d AND r.author = $%d",
+		recipeTable, setQuery, argId, argId+1)
+
+	args = append(args, recipeId, userId)
+
+	_, err := r.db.Exec(query, args...)
+	return err
+}
+
 func (r *RecipeStorage) GetById(recipeId int) (model.Recipe, error) {
 	var recipe model.Recipe
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", recipeTable)

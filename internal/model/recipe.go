@@ -14,6 +14,11 @@ type CreateRecipeReq struct {
 	Steps       []CreateStepReq `json:"steps"`
 }
 
+type UpdateRecipeReq struct {
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+}
+
 type GetAllRecipesReq struct {
 	IngredientFilter []int  `json:"ingredient_filter"`
 	DurationSort     string `json:"duration_sort"`

@@ -54,3 +54,8 @@ func (r *RecipeService) RemoveIngredientFromRecipe(userId, recipeId, ingredientI
 func (r *RecipeService) AddIngredientToRecipe(userId int, recipeId int, ingredient model.AddIngredientReq) (int, error) {
 	return r.storage.AddIngredientToRecipe(userId, recipeId, ingredient)
 }
+
+func (r *RecipeService) Update(userId, recipeId int, recipe model.UpdateRecipeReq) error {
+	return r.storage.Update(userId, recipeId, recipe)
+
+}
