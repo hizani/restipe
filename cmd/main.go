@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"restipe/internal/handler"
 	"restipe/internal/server"
 	"restipe/internal/service"
@@ -12,9 +13,12 @@ import (
 )
 
 func main() {
-	viper.AddConfigPath("config")
+	configDirPath := os.Args[1]
+
+	viper.AddConfigPath(configDirPath)
 	viper.SetConfigName("config")
 	if err := viper.ReadInConfig(); err != nil {
+
 		log.Fatalf("can't initialize config: %s", err.Error())
 	}
 
