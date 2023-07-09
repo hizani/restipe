@@ -15,8 +15,8 @@ type Recipe interface {
 	Create(userId int, recipe model.CreateRecipeReq) (int, error)
 	Delete(userId, recipeId int) error
 	Update(userId, recipeId int, recipe model.UpdateRecipeReq) error
-	GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error)
-	GetById(recipeId int) (model.Recipe, error)
+	GetAll(recipe model.GetAllRecipesReq) ([]model.AllRecipeResp, error)
+	GetById(recipeId int) (model.RecipeResp, error)
 	GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error)
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
 	AddStepToRecipe(userId, recipeId int, step model.AddStepReq) (int, error)

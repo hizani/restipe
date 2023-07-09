@@ -22,11 +22,11 @@ func (r *RecipeService) Delete(userId, recipeId int) error {
 
 }
 
-func (r *RecipeService) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error) {
+func (r *RecipeService) GetAll(recipe model.GetAllRecipesReq) ([]model.AllRecipeResp, error) {
 	return r.storage.GetAll(recipe)
 }
 
-func (r *RecipeService) GetById(recipeId int) (model.Recipe, error) {
+func (r *RecipeService) GetById(recipeId int) (model.RecipeResp, error) {
 	return r.storage.GetById(recipeId)
 }
 

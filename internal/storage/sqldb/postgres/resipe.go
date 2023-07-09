@@ -116,51 +116,48 @@ func (r *RecipeStorage) Delete(userId, recipeId int) error {
 	return tx.Commit()
 }
 
-func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.Recipe, error) {
-	recipes := []model.Recipe{}
-	query := strings.Builder{}
-	query.Grow(256)
-	query.WriteString("SELECT rd.id, rd.name, rd.description, rd.author  FROM ")
-	recipeQuery := fmt.Sprintf("SELECT * FROM %s", recipeTable)
-	groupBy := "GROUP BY rd.id, rd.name, rd.description, rd.author "
+func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.AllRecipeResp, error) {
+	setQuery := make([]string, 5)
 
-	durationSort := strings.ToUpper(recipe.DurationSort)
-	if durationSort == "ASC" || durationSort == "DESC" {
-		recipeQuery = fmt.Sprintf("SELECT r.*, SUM(st.duration) dur FROM %s r "+
-			"JOIN %s st on st.recipe_id  = r.id GROUP BY r.id",
-			recipeTable, stepTable,
-		)
-		groupBy = "GROUP BY rd.id, rd.name, rd.description, rd.author, rd.dur "
-	}
-	query.WriteString(fmt.Sprintf("(%s) rd ", recipeQuery))
-
-	havingIngredients := ""
-	if len(recipe.IngredientFilter) != 0 {
-		query.WriteString(
-			fmt.Sprintf("JOIN %s ir ON rd.id = ir.recipe_id AND ir.ingredient_id in (",
+	if len(recipe.IngredientFilter) > 0 {
+		setQuery[0] =
+			fmt.Sprintf("JOIN %s ir ON rd.id = ir.recipe_id AND ir.ingredient_id in (%s)",
 				ingredientRecipeTable,
-			),
-		)
-		for i, v := range recipe.IngredientFilter {
-			query.WriteString(fmt.Sprintf("%d", v))
-			if i != len(recipe.IngredientFilter)-1 {
-				query.WriteString(",")
-			}
+				strings.Trim(strings.Join(strings.Fields(fmt.Sprint(recipe.IngredientFilter)), ","), "[]"),
+			)
+		setQuery[3] = fmt.Sprintf("HAVING COUNT(ir.ingredient_id) = %d ", len(recipe.IngredientFilter))
+	}
+
+	queryDelim := "WHERE"
+	if len(recipe.DurationFilter) > 0 {
+		queryDelim = "AND"
+
+		splited := strings.Fields(strings.Trim(fmt.Sprint(recipe.DurationFilter), "[]"))
+		for i := range splited {
+			splited[i] = splited[i] + "s"
 		}
-		query.WriteString(") ")
-		havingIngredients = fmt.Sprintf("HAVING COUNT(ir.ingredient_id) = %d ", len(recipe.IngredientFilter))
-	}
-	if recipe.Author != 0 {
-		query.WriteString(fmt.Sprintf("WHERE rd.author = %d ", recipe.Author))
-	}
-
-	query.WriteString(groupBy)
-	query.WriteString(havingIngredients)
-	if durationSort == "ASC" || durationSort == "DESC" {
-		query.WriteString(fmt.Sprintf("ORDER BY rd.dur %s", durationSort))
+		setQuery[1] =
+			fmt.Sprintf("WHERE rd.dur = '%s'",
+				strings.Join(splited, "' AND rd.dur = '"),
+			)
 	}
 
-	err := r.db.Select(&recipes, query.String())
+	if recipe.Author != nil {
+		setQuery[2] = fmt.Sprintf("%s rd.author = %d", queryDelim, *recipe.Author)
+	}
+
+	recipe.DurationSort = strings.ToUpper(recipe.DurationSort)
+	if recipe.DurationSort == "ASC" || recipe.DurationSort == "DESC" {
+		setQuery[4] = fmt.Sprintf("ORDER BY rd.dur %s", recipe.DurationSort)
+	}
+
+	query := fmt.Sprintf("SELECT rd.id, rd.name, rd.description, rd.author, EXTRACT(EPOCH FROM rd.dur)::int duration FROM "+
+		"(SElECT r.*, SUM(st.duration) dur FROM %s r JOIN %s st ON st.recipe_id = r.id GROUP BY r.id) rd "+
+		"%s %s %s GROUP BY rd.id, rd.name, rd.description, rd.author, rd.dur %s %s",
+		recipeTable, stepTable, setQuery[0], setQuery[1], setQuery[2], setQuery[3], setQuery[4])
+
+	recipes := []model.AllRecipeResp{}
+	err := r.db.Select(&recipes, query)
 
 	return recipes, err
 }
@@ -187,21 +184,39 @@ func (r *RecipeStorage) Update(userId, recipeId int, recipe model.UpdateRecipeRe
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-
 	query := fmt.Sprintf("UPDATE %s r SET %s WHERE r.id = $%d AND r.author = $%d",
 		recipeTable, setQuery, argId, argId+1)
-
 	args = append(args, recipeId, userId)
 
 	_, err := r.db.Exec(query, args...)
 	return err
 }
 
-func (r *RecipeStorage) GetById(recipeId int) (model.Recipe, error) {
-	var recipe model.Recipe
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", recipeTable)
-	err := r.db.Get(&recipe, query, recipeId)
+func (r *RecipeStorage) GetById(recipeId int) (model.RecipeResp, error) {
+	var recipe model.RecipeResp
+	queryRecipe := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", recipeTable)
+	err := r.db.Get(&recipe, queryRecipe, recipeId)
+	if err != nil {
+		return recipe, err
+	}
+
+	var ingredients []model.Ingredient
+	queryIngredients := fmt.Sprintf("SELECT ingredient_id id, i.name, quantity FROM %s ir "+
+		"JOIN %s i ON ir.ingredient_id = i.id WHERE recipe_id = $1", ingredientRecipeTable, ingredientTable)
+	err = r.db.Select(&ingredients, queryIngredients, recipeId)
+	if err != nil {
+		return recipe, err
+	}
+	recipe.Ingredients = ingredients
+
+	var steps []model.Step
+	queryStep := fmt.Sprintf("SELECT id, number, description, EXTRACT(EPOCH FROM duration)::int duration "+
+		"FROM %s WHERE recipe_id = $1", stepTable)
+	err = r.db.Select(&steps, queryStep, recipeId)
+	recipe.Steps = steps
+
 	return recipe, err
+
 }
 
 func (r *RecipeStorage) GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error) {
