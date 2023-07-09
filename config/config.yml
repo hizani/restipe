@@ -4,7 +4,7 @@ jwttoken: "_yourprivatejwttoken_"
 db:
     username: "postgres"
     password: "postgres"
-    host:     "localhost"
+    host:     "db"
     port:     "5432"
     dbname:   "restipe"
     ssl:      "disable"

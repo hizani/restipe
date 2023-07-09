@@ -1,9 +1,7 @@
 version: '3'
 services:
   db:
-    build: 
-      context: ./db
-    container_name: postgres
+    image: postgres
     ports:
       - 5432:5432
     restart: always
@@ -11,14 +9,22 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: restipe
     volumes:
-     - ./db/default:/db/data
-
+      - ./db/default:/db/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: pg_isready -d restipe
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 3s
 
   restipe:
+    restart: on-failure
     build:
       context: .
       dockerfile: cmd/Dockerfile
     ports:
       - 8000:8000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
