@@ -1,9 +1,9 @@
 package model
 
 type CreateStepReq struct {
-	RecipeId    int    `json:"recipe_id" db:"recipe_id"`
+	RecipeId    int    `json:"recipe_id" db:"recipe_id" example:"1"`
 	Description string `json:"description" binding:"required" db:"description"`
-	Duration    int64  `json:"duration" binding:"required" db:"duration"`
+	Duration    int64  `json:"duration" binding:"required" db:"duration" example:"240"`
 }
 
 type Step struct {
@@ -15,5 +15,5 @@ type Step struct {
 
 type AddStepReq struct {
 	Description string `json:"description" binding:"required"`
-	Duration    int64  `json:"duration" binding:"required"`
+	Duration    int64  `json:"duration" binding:"required" example:"7200"`
 }

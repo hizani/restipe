@@ -8,6 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary add ingredient
+// @Security ApiKeyAuth
+// @Tags recipe ingredient
+// @Description  add ingredient to recipe
+// @ID add-ingredient
+// @Accept json
+// @Produce json
+// @Param input body model.AddIngredientReq true "ingredient info"
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes/{id}/ingredients [post]
 func (h *GinHandler) addIngredientToRecipe(c *gin.Context) {
 	userId := c.GetInt(userCtx)
 	if userId == 0 {
@@ -35,6 +48,16 @@ func (h *GinHandler) addIngredientToRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{"id": id})
 }
 
+// @Summary get ingredients
+// @Tags recipe ingredient
+// @Description  get all recipe ingredients
+// @ID get-ingredients
+// @Produce json
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes/{id}/ingredients [get]
 func (h *GinHandler) getAllIngredientsFromRecipe(c *gin.Context) {
 	recipeId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -50,6 +73,17 @@ func (h *GinHandler) getAllIngredientsFromRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, ingredients)
 }
 
+// @Summary remove ingredient
+// @Security ApiKeyAuth
+// @Tags recipe ingredient
+// @Description  remove ingredient from recipe
+// @ID remove-ingredient
+// @Produce json
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes/{id}/ingredients/{ingid} [delete]
 func (h *GinHandler) removeIngredientFromRecipe(c *gin.Context) {
 	userId := c.GetInt(userCtx)
 	if userId == 0 {

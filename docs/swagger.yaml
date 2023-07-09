@@ -1,0 +1,587 @@
+basePath: /
+definitions:
+  ginhandler.ginHandlerError:
+    properties:
+      message:
+        type: string
+    type: object
+  model.AddIngredientReq:
+    properties:
+      ingredient_id:
+        example: 1
+        type: integer
+      quantity:
+        example: 10
+        type: integer
+    required:
+    - ingredient_id
+    - quantity
+    type: object
+  model.AddStepReq:
+    properties:
+      description:
+        type: string
+      duration:
+        example: 7200
+        type: integer
+    required:
+    - description
+    - duration
+    type: object
+  model.CreateRecipeReq:
+    properties:
+      description:
+        type: string
+      ingredients:
+        items:
+          $ref: '#/definitions/model.AddIngredientReq'
+        type: array
+      name:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/model.CreateStepReq'
+        type: array
+    required:
+    - name
+    type: object
+  model.CreateStepReq:
+    properties:
+      description:
+        type: string
+      duration:
+        example: 240
+        type: integer
+      recipe_id:
+        example: 1
+        type: integer
+    required:
+    - description
+    - duration
+    type: object
+  model.GetAllRecipesReq:
+    properties:
+      author:
+        example: 1
+        type: integer
+      duration_filter:
+        example: 7200
+        type: integer
+      duration_sort:
+        example: DESC
+        type: string
+      ingredient_filter:
+        example:
+        - 1
+        items:
+          type: integer
+        type: array
+    type: object
+  model.SigninUserReq:
+    properties:
+      Login:
+        example: user1
+        type: string
+      password:
+        example: user1
+        type: string
+    required:
+    - Login
+    - password
+    type: object
+  model.SignupUserReq:
+    properties:
+      Login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - Login
+    - name
+    - password
+    type: object
+  model.UpdateRecipeReq:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: API Server for Recipe Application
+  title: Recipe App API
+  version: "0.1"
+paths:
+  /api/recipes:
+    get:
+      consumes:
+      - application/json
+      description: get all recipes
+      operationId: get-all-recipes
+      parameters:
+      - description: recipe search request info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.GetAllRecipesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: get all recipes
+      tags:
+      - recipe
+    post:
+      consumes:
+      - application/json
+      description: create recipe
+      operationId: create-recipe
+      parameters:
+      - description: recipe info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateRecipeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: create recipe
+      tags:
+      - recipe
+  /api/recipes/{id}:
+    delete:
+      description: delete recipe
+      operationId: delete-recipe
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: delete recipe
+      tags:
+      - recipe
+    get:
+      description: get recipe by id
+      operationId: get-recipe-by-id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: get recipe by id
+      tags:
+      - recipe
+    put:
+      consumes:
+      - application/json
+      description: update recipe
+      operationId: update-recipe
+      parameters:
+      - description: recipe update info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateRecipeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: update recipe
+      tags:
+      - recipe
+  /api/recipes/{id}/ingredients:
+    get:
+      description: get all recipe ingredients
+      operationId: get-ingredients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: get ingredients
+      tags:
+      - recipe ingredient
+    post:
+      consumes:
+      - application/json
+      description: add ingredient to recipe
+      operationId: add-ingredient
+      parameters:
+      - description: ingredient info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddIngredientReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: add ingredient
+      tags:
+      - recipe ingredient
+  /api/recipes/{id}/ingredients/{ingid}:
+    delete:
+      description: remove ingredient from recipe
+      operationId: remove-ingredient
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: remove ingredient
+      tags:
+      - recipe ingredient
+  /api/recipes/{id}/ingredients/{stepid}:
+    delete:
+      description: remove step from recipe
+      operationId: remove-step
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: remove step
+      tags:
+      - recipe step
+  /api/recipes/{id}/step:
+    post:
+      consumes:
+      - application/json
+      description: add step to recipe
+      operationId: add-step
+      parameters:
+      - description: ingredient info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddStepReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: add step
+      tags:
+      - recipe step
+  /api/recipes/{id}/steps:
+    get:
+      description: get all recipe steps
+      operationId: get-steps
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: get steps
+      tags:
+      - recipe step
+  /auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: log into user account
+      operationId: login
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.SigninUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: SingIn
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignupUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: SingUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

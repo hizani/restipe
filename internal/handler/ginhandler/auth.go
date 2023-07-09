@@ -8,6 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary SingUp
+// @Tags auth
+// @Description create account
+// @ID create-account
+// @Accept json
+// @Produce json
+// @Param input body model.SignupUserReq true "account info"
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /auth/signup [post]
 func (h *GinHandler) signUp(c *gin.Context) {
 	var input model.SignupUserReq
 
@@ -24,6 +36,18 @@ func (h *GinHandler) signUp(c *gin.Context) {
 
 }
 
+// @Summary SingIn
+// @Tags auth
+// @Description log into user account
+// @ID login
+// @Accept json
+// @Produce json
+// @Param input body model.SigninUserReq true "account info"
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /auth/signin [post]
 func (h *GinHandler) signIn(c *gin.Context) {
 	var input model.SigninUserReq
 

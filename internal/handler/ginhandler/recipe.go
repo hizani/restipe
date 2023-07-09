@@ -8,6 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary create recipe
+// @Security ApiKeyAuth
+// @Tags recipe
+// @Description create recipe
+// @ID create-recipe
+// @Accept json
+// @Produce json
+// @Param input body model.CreateRecipeReq true "recipe info"
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes [post]
 func (h *GinHandler) createRecipe(c *gin.Context) {
 	userId := c.GetInt(userCtx)
 	if userId == 0 {
@@ -28,6 +41,18 @@ func (h *GinHandler) createRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{"id": id})
 }
 
+// @Summary get all recipes
+// @Tags recipe
+// @Description get all recipes
+// @ID get-all-recipes
+// @Accept json
+// @Produce json
+// @Param input body model.GetAllRecipesReq true "recipe search request info"
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes [get]
 func (h *GinHandler) getAllRecipes(c *gin.Context) {
 	var input model.GetAllRecipesReq
 	if err := c.BindJSON(&input); err != nil {
@@ -43,6 +68,16 @@ func (h *GinHandler) getAllRecipes(c *gin.Context) {
 
 }
 
+// @Summary get recipe by id
+// @Tags recipe
+// @Description get recipe by id
+// @ID get-recipe-by-id
+// @Produce json
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes/{id} [get]
 func (h *GinHandler) getRecipeById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -59,6 +94,19 @@ func (h *GinHandler) getRecipeById(c *gin.Context) {
 
 }
 
+// @Summary update recipe
+// @Security ApiKeyAuth
+// @Tags recipe
+// @Description update recipe
+// @ID update-recipe
+// @Accept json
+// @Produce json
+// @Param input body model.UpdateRecipeReq true "recipe update info"
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes/{id} [put]
 func (h *GinHandler) updateRecipe(c *gin.Context) {
 	userId := c.GetInt(userCtx)
 	if userId == 0 {
@@ -86,6 +134,17 @@ func (h *GinHandler) updateRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
+// @Summary delete recipe
+// @Security ApiKeyAuth
+// @Tags recipe
+// @Description delete recipe
+// @ID delete-recipe
+// @Produce json
+// @Success 200  {integer} integer 1
+// @Failure 400,404 {object} ginHandlerError
+// @Failure 500 {object} ginHandlerError
+// @failure default {object} ginHandlerError
+// @Router /api/recipes/{id} [delete]
 func (h *GinHandler) deleteRecipe(c *gin.Context) {
 	userId := c.GetInt(userCtx)
 	if userId == 0 {

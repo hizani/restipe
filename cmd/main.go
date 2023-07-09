@@ -16,6 +16,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+// @title Recipe App API
+// @version 0.1
+// @description API Server for Recipe Application
+
+// @host localhost:8000
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	configDirPath := os.Args[1]
 

@@ -19,10 +19,10 @@ type RecipeResp struct {
 }
 
 type CreateRecipeReq struct {
-	Name        string          `json:"name" binding:"required"`
-	Description string          `json:"description"`
-	Ingredients []Ingredient    `json:"ingredients"`
-	Steps       []CreateStepReq `json:"steps"`
+	Name        string             `json:"name" binding:"required"`
+	Description string             `json:"description"`
+	Ingredients []AddIngredientReq `json:"ingredients"`
+	Steps       []CreateStepReq    `json:"steps"`
 }
 
 type UpdateRecipeReq struct {
@@ -31,8 +31,8 @@ type UpdateRecipeReq struct {
 }
 
 type GetAllRecipesReq struct {
-	IngredientFilter []int   `json:"ingredient_filter"`
-	DurationFilter   []int64 `json:"duration_filter"`
-	DurationSort     string  `json:"duration_sort"`
-	Author           *int    `json:"author"`
+	IngredientFilter []int   `json:"ingredient_filter" example:"1"`
+	DurationFilter   *int64  `json:"duration_filter" example:"7200"`
+	DurationSort     *string `json:"duration_sort" example:"DESC"`
+	Author           *int    `json:"author" example:"1"`
 }

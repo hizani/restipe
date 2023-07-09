@@ -5,6 +5,10 @@ import (
 	"restipe/internal/service"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	docs "restipe/docs"
 )
 
 const (
@@ -19,6 +23,9 @@ type GinHandler struct {
 func New(service *service.Service) *GinHandler {
 	router := gin.New()
 	h := &GinHandler{router, service}
+
+	docs.SwaggerInfo.BasePath = "/"
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group("/auth")
 	{

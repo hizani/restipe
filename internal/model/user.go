@@ -12,6 +12,6 @@ type SignupUserReq struct {
 }
 
 type SigninUserReq struct {
-	Login    string `json:"Login" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Login    string `json:"Login" binding:"required" example:"user1"`
+	Password string `json:"password" binding:"required" example:"user1"`
 }

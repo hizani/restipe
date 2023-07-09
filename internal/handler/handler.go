@@ -8,5 +8,4 @@ import (
 
 func NewGinHandler(service *service.Service) http.Handler {
 	return ginhandler.New(service)
-
 }

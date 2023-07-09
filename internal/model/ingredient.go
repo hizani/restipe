@@ -7,6 +7,6 @@ type Ingredient struct {
 }
 
 type AddIngredientReq struct {
-	IngredientId int `json:"ingredient_id" binding:"required"`
-	Quantity     int `json:"quantity" binding:"required"`
+	IngredientId int `json:"ingredient_id" binding:"required" example:"1"`
+	Quantity     int `json:"quantity" binding:"required" example:"10"`
 }

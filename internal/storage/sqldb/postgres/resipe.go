@@ -43,7 +43,7 @@ func (r *RecipeStorage) Create(userId int, recipe model.CreateRecipeReq) (int, e
 		}
 		for i, v := range recipe.Ingredients {
 			createRecipeIngredients.WriteString(
-				fmt.Sprintf("(%d, %d, %d)", id, v.Id, v.Quantity),
+				fmt.Sprintf("(%d, %d, %d)", id, v.IngredientId, v.Quantity),
 			)
 			if i < len(recipe.Ingredients)-1 {
 				createRecipeIngredients.WriteString(", ")
@@ -129,26 +129,24 @@ func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.AllRecipe
 	}
 
 	queryDelim := "WHERE"
-	if len(recipe.DurationFilter) > 0 {
+	if recipe.DurationFilter != nil {
 		queryDelim = "AND"
 
-		splited := strings.Fields(strings.Trim(fmt.Sprint(recipe.DurationFilter), "[]"))
-		for i := range splited {
-			splited[i] = splited[i] + "s"
-		}
+		duration := fmt.Sprintf("'%ds'", *recipe.DurationFilter)
 		setQuery[1] =
-			fmt.Sprintf("WHERE rd.dur = '%s'",
-				strings.Join(splited, "' AND rd.dur = '"),
+			fmt.Sprintf("WHERE rd.dur = %s",
+				duration,
 			)
 	}
 
 	if recipe.Author != nil {
 		setQuery[2] = fmt.Sprintf("%s rd.author = %d", queryDelim, *recipe.Author)
 	}
-
-	recipe.DurationSort = strings.ToUpper(recipe.DurationSort)
-	if recipe.DurationSort == "ASC" || recipe.DurationSort == "DESC" {
-		setQuery[4] = fmt.Sprintf("ORDER BY rd.dur %s", recipe.DurationSort)
+	if recipe.DurationSort != nil {
+		durSort := strings.ToUpper(*recipe.DurationSort)
+		if durSort == "ASC" || durSort == "DESC" {
+			setQuery[4] = fmt.Sprintf("ORDER BY rd.dur %s", durSort)
+		}
 	}
 
 	query := fmt.Sprintf("SELECT rd.id, rd.name, rd.description, rd.author, EXTRACT(EPOCH FROM rd.dur)::int duration FROM "+
