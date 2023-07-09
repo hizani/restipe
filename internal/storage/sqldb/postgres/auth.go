@@ -33,3 +33,7 @@ func (s *AuthStorage) SignupUser(user model.SignupUserReq) (int, error) {
 
 	return id, nil
 }
+
+func (s *AuthStorage) Close() error {
+	return s.db.Close()
+}

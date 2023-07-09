@@ -9,6 +9,8 @@ import (
 type Authorization interface {
 	SignupUser(user model.SignupUserReq) (int, error)
 	SigninUser(user model.SigninUserReq) (int, error)
+
+	Close() error
 }
 
 type Recipe interface {
@@ -23,6 +25,8 @@ type Recipe interface {
 	AddIngredientToRecipe(userId, recipeId int, ingredient model.AddIngredientReq) (int, error)
 	RemoveStepFromRecipe(userId, recipeId, stepId int) error
 	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
+
+	Close() error
 }
 
 type Storage struct {
@@ -39,4 +43,11 @@ func NewPostgres(cfg sqldb.Config) (*Storage, error) {
 		Authorization: postgres.NewAuthStoarge(db),
 		Recipe:        postgres.NewRecipeStorage(db),
 	}, err
+}
+
+func (s *Storage) Close() error {
+	if err := s.Authorization.Close(); err != nil {
+		return err
+	}
+	return s.Recipe.Close()
 }

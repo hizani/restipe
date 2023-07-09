@@ -403,3 +403,7 @@ func (r *RecipeStorage) RemoveIngredientFromRecipe(userId, recipeId, ingredientI
 	return tx.Commit()
 
 }
+
+func (r *RecipeStorage) Close() error {
+	return r.db.Close()
+}

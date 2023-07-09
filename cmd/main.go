@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
 	"restipe/internal/handler"
 	"restipe/internal/server"
 	"restipe/internal/service"
 	"restipe/internal/storage"
 	"restipe/internal/storage/sqldb"
+	"syscall"
 
 	"github.com/spf13/viper"
 )
@@ -37,8 +41,22 @@ func main() {
 	handler := handler.NewGinHandler(service)
 
 	server := server.New(viper.GetString("port"), handler)
-	if err := server.Run(); err != nil {
-		log.Fatalf("unexpected server shutdown: %s", err.Error())
+	go func() {
+		if err := server.Run(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("unexpected server shutdown: %s", err.Error())
+		}
+	}()
+
+	sigQuit := make(chan os.Signal)
+	signal.Notify(sigQuit, syscall.SIGTERM, syscall.SIGINT)
+	<-sigQuit
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		log.Printf("error on server shutdown: %s", err.Error())
+	}
+
+	if err := storage.Close(); err != nil {
+		log.Printf("error on db close: %s", err.Error())
 	}
 
 }
