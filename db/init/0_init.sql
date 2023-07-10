@@ -35,3 +35,10 @@ CREATE TABLE step (
   "duration" interval second(0)
 );
 
+CREATE TABLE Rating (
+  "id" serial primary key, 
+  "recipe_id" int references recipe(id) on delete cascade,
+  "user_id" int references "user"(id) on delete cascade,
+  "rating" smallint,
+  UNIQUE(recipe_id, user_id)
+)
