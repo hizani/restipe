@@ -1,6 +1,7 @@
 package recipeservice
 
 import (
+	"errors"
 	"restipe/internal/model"
 	"restipe/internal/storage"
 )
@@ -58,4 +59,18 @@ func (r *RecipeService) AddIngredientToRecipe(userId int, recipeId int, ingredie
 func (r *RecipeService) Update(userId, recipeId int, recipe model.UpdateRecipeReq) error {
 	return r.storage.Update(userId, recipeId, recipe)
 
+}
+
+func (r *RecipeService) RateRecipe(userId, recipeId int, rating model.RateReq) (int, error) {
+	if rating.Rating < 1 || rating.Rating > 5 {
+		return 0, errors.New("rating should be >=1 and <=5")
+	}
+	return r.storage.RateRecipe(userId, recipeId, rating)
+}
+
+func (r *RecipeService) RerateRecipe(userId, recipeId int, rating model.RateReq) error {
+	if rating.Rating < 1 || rating.Rating > 5 {
+		return errors.New("rating should be >=1 and <=5")
+	}
+	return r.storage.RerateRecipe(userId, recipeId, rating)
 }

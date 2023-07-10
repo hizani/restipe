@@ -67,6 +67,11 @@ func New(service *service.Service) *GinHandler {
 					steps.POST("/", h.addStepToRecipe)
 					steps.DELETE("/:stepid", h.removeStepFromRecipe)
 				}
+				rates := auth.Group(":id/rates")
+				{
+					rates.POST("/", h.RateRecipe)
+					rates.PUT("/", h.RerateRecipe)
+				}
 			}
 
 		}

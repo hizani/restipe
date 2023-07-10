@@ -76,6 +76,14 @@ definitions:
         items:
           type: integer
         type: array
+      rating_filter:
+        example: 4.5
+        type: number
+      rating_sort:
+        example: ASC
+        type: string
+    required:
+    - author
     type: object
   model.SigninUserReq:
     properties:

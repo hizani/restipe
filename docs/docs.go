@@ -817,6 +817,9 @@ const docTemplate = `{
         },
         "model.GetAllRecipesReq": {
             "type": "object",
+            "required": [
+                "author"
+            ],
             "properties": {
                 "author": {
                     "type": "integer",
@@ -838,6 +841,14 @@ const docTemplate = `{
                     "example": [
                         1
                     ]
+                },
+                "rating_filter": {
+                    "type": "number",
+                    "example": 4.5
+                },
+                "rating_sort": {
+                    "type": "string",
+                    "example": "ASC"
                 }
             }
         },

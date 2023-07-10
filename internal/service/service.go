@@ -24,6 +24,8 @@ type Recipe interface {
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
 	RemoveStepFromRecipe(userId, recipeId, stepId int) error
 	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
+	RateRecipe(userId, recipeId int, rating model.RateReq) (int, error)
+	RerateRecipe(userId, recipeId int, rating model.RateReq) error
 }
 
 type Service struct {

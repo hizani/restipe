@@ -117,7 +117,7 @@ func (r *RecipeStorage) Delete(userId, recipeId int) error {
 }
 
 func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.AllRecipeResp, error) {
-	setQuery := make([]string, 5)
+	setQuery := make([]string, 7)
 
 	if len(recipe.IngredientFilter) > 0 {
 		setQuery[0] =
@@ -125,34 +125,53 @@ func (r *RecipeStorage) GetAll(recipe model.GetAllRecipesReq) ([]model.AllRecipe
 				ingredientRecipeTable,
 				strings.Trim(strings.Join(strings.Fields(fmt.Sprint(recipe.IngredientFilter)), ","), "[]"),
 			)
-		setQuery[3] = fmt.Sprintf("HAVING COUNT(ir.ingredient_id) = %d ", len(recipe.IngredientFilter))
+		setQuery[4] = fmt.Sprintf("HAVING COUNT(ir.ingredient_id) = %d ", len(recipe.IngredientFilter))
 	}
 
-	queryDelim := "WHERE"
+	whereStart := "WHERE"
 	if recipe.DurationFilter != nil {
-		queryDelim = "AND"
-
 		duration := fmt.Sprintf("'%ds'", *recipe.DurationFilter)
 		setQuery[1] =
-			fmt.Sprintf("WHERE rd.dur = %s",
+			fmt.Sprintf("%s rd.dur = %s",
+				whereStart,
 				duration,
 			)
+		whereStart = "AND"
 	}
 
 	if recipe.Author != nil {
-		setQuery[2] = fmt.Sprintf("%s rd.author = %d", queryDelim, *recipe.Author)
+		setQuery[2] = fmt.Sprintf("%s rd.author = %d", whereStart, *recipe.Author)
 	}
+
+	if recipe.RatingFilter != nil {
+		setQuery[3] = fmt.Sprintf("%s rt.avg_rating = %f", whereStart, *recipe.RatingFilter)
+	}
+
+	orderStart := "ORDER BY"
 	if recipe.DurationSort != nil {
 		durSort := strings.ToUpper(*recipe.DurationSort)
 		if durSort == "ASC" || durSort == "DESC" {
-			setQuery[4] = fmt.Sprintf("ORDER BY rd.dur %s", durSort)
+			setQuery[5] = fmt.Sprintf("%s rd.dur %s", orderStart, durSort)
+			orderStart = ","
+		}
+	}
+	if recipe.RatingSort != nil {
+		ratingSort := strings.ToUpper(*recipe.RatingSort)
+		if ratingSort == "ASC" || ratingSort == "DESC" {
+			setQuery[6] = fmt.Sprintf("%s avg_rating %s", orderStart, ratingSort)
 		}
 	}
 
-	query := fmt.Sprintf("SELECT rd.id, rd.name, rd.description, rd.author, EXTRACT(EPOCH FROM rd.dur)::int duration FROM "+
+	query := fmt.Sprintf("SELECT rd.id, rd.name, rd.description, rd.author, "+
+		"EXTRACT(EPOCH FROM rd.dur)::int duration, COALESCE(rt.avg_rating, 0) avg_rating FROM "+
 		"(SElECT r.*, SUM(st.duration) dur FROM %s r JOIN %s st ON st.recipe_id = r.id GROUP BY r.id) rd "+
-		"%s %s %s GROUP BY rd.id, rd.name, rd.description, rd.author, rd.dur %s %s",
-		recipeTable, stepTable, setQuery[0], setQuery[1], setQuery[2], setQuery[3], setQuery[4])
+		"LEFT JOIN (SElECT rt.recipe_id, AVG(rt.rating)::numeric(2,1) avg_rating FROM %s rt GROUP BY rt.recipe_id) rt "+
+		"ON rt.recipe_id = rd.id "+
+		"%s %s %s %s GROUP BY rd.id, rd.name, rd.description, rd.author, rd.dur, avg_rating %s %s%s",
+		recipeTable, stepTable, ratingTable,
+		setQuery[0], setQuery[1], setQuery[2], setQuery[3], setQuery[4], setQuery[5], setQuery[6])
+
+	fmt.Println(query)
 
 	recipes := []model.AllRecipeResp{}
 	err := r.db.Select(&recipes, query)
@@ -192,7 +211,8 @@ func (r *RecipeStorage) Update(userId, recipeId int, recipe model.UpdateRecipeRe
 
 func (r *RecipeStorage) GetById(recipeId int) (model.RecipeResp, error) {
 	var recipe model.RecipeResp
-	queryRecipe := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", recipeTable)
+	queryRecipe := fmt.Sprintf("SELECT r.*, COALESCE(AVG(rt.rating)::numeric(2, 1), 0) avg_rating FROM %s r "+
+		"LEFT JOIN %s rt ON r.id = rt.recipe_id WHERE r.id = $1 GROUP BY r.id", recipeTable, ratingTable)
 	err := r.db.Get(&recipe, queryRecipe, recipeId)
 	if err != nil {
 		return recipe, err
@@ -212,6 +232,11 @@ func (r *RecipeStorage) GetById(recipeId int) (model.RecipeResp, error) {
 		"FROM %s WHERE recipe_id = $1", stepTable)
 	err = r.db.Select(&steps, queryStep, recipeId)
 	recipe.Steps = steps
+	var durAcc int64
+	for _, v := range steps {
+		durAcc += v.Duration
+	}
+	recipe.Duration = durAcc
 
 	return recipe, err
 
@@ -400,6 +425,25 @@ func (r *RecipeStorage) RemoveIngredientFromRecipe(userId, recipeId, ingredientI
 	}
 	return tx.Commit()
 
+}
+
+func (r *RecipeStorage) RateRecipe(userId, recipeId int, rating model.RateReq) (int, error) {
+	var id int
+	query := fmt.Sprintf(
+		"INSERT INTO %s (user_id, recipe_id, rating) VALUES ($1, $2, $3) RETURNING id",
+		ratingTable,
+	)
+	row := r.db.QueryRow(query, userId, recipeId, rating.Rating)
+	return id, row.Scan(&id)
+}
+
+func (r *RecipeStorage) RerateRecipe(userId, recipeId int, rating model.RateReq) error {
+	query := fmt.Sprintf(
+		"UPDATE %s SET rating = $1 WHERE user_id = $2 AND recipe_id = $3",
+		ratingTable,
+	)
+	_, err := r.db.Exec(query, rating.Rating, userId, recipeId)
+	return err
 }
 
 func (r *RecipeStorage) Close() error {

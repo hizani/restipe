@@ -14,6 +14,7 @@ const (
 	ingredientTable       = "\"ingredient\""
 	ingredientRecipeTable = "\"ingredient_recipe\""
 	stepTable             = "\"step\""
+	ratingTable           = "\"rating\""
 )
 
 func New(cfg sqldb.Config) (*sqlx.DB, error) {

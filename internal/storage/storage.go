@@ -25,6 +25,8 @@ type Recipe interface {
 	AddIngredientToRecipe(userId, recipeId int, ingredient model.AddIngredientReq) (int, error)
 	RemoveStepFromRecipe(userId, recipeId, stepId int) error
 	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
+	RateRecipe(userId, recipeId int, rating model.RateReq) (int, error)
+	RerateRecipe(userId, recipeId int, rating model.RateReq) error
 
 	Close() error
 }
