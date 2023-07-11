@@ -26,7 +26,7 @@ func (s *AuthStorage) SigninUser(user model.SigninUserReq) (int, error) {
 func (s *AuthStorage) SignupUser(user model.SignupUserReq) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (name, login, password_hash) values ($1, $2, $3) RETURNING id", userTable)
-	row := s.db.QueryRow(query, user.Name, user.Login, fmt.Sprintf("%s", user.Password))
+	row := s.db.QueryRow(query, user.Name, user.Login, user.Password)
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
