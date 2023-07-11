@@ -285,6 +285,113 @@
                 }
             }
         },
+        "/api/recipes/{id}/image": {
+            "get": {
+                "description": "download an image of a recipe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipe image"
+                ],
+                "summary": "download recipe images",
+                "operationId": "download-recipe-img",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recipes/{id}/images": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "upload recipe image. multipart key should be named as \"image\"",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipe image"
+                ],
+                "summary": "upload recipe image",
+                "operationId": "upload-recipe-img",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "uploaded image",
+                        "name": "input",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/recipes/{id}/ingredients": {
             "get": {
                 "description": "get all recipe ingredients",
@@ -442,7 +549,7 @@
                 }
             }
         },
-        "/api/recipes/{id}/ingredients/{stepid}": {
+        "/api/recipes/{id}/ingredients/{number}": {
             "delete": {
                 "security": [
                     {
@@ -556,15 +663,34 @@
                 }
             },
             "post": {
-                "description": "download an archive of all recipe images",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "rate recipe from 1 to 5",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "recipe rating"
                 ],
-                "summary": "download recipe images",
-                "operationId": "download-recipe-imgs",
+                "summary": "rate recipe",
+                "operationId": "rate-recipe",
+                "parameters": [
+                    {
+                        "description": "rate number",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RateReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -674,6 +800,111 @@
                 ],
                 "summary": "get steps",
                 "operationId": "get-steps",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recipes/{id}/steps/{number}/images": {
+            "get": {
+                "description": "download an image of a recipe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipe image"
+                ],
+                "summary": "download step image",
+                "operationId": "download-step-img",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "upload step image. multipart key should be named as \"image\"",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipe image"
+                ],
+                "summary": "upload step image",
+                "operationId": "upload-step-img",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "uploaded image",
+                        "name": "input",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

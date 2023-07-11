@@ -117,11 +117,11 @@ func (h *GinHandler) removeStepFromRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
-// @Summary upload recipe image
+// @Summary upload step image
 // @Security ApiKeyAuth
 // @Tags recipe image
-// @Description  upload recipe image. multipart key should be named as "image"
-// @ID rate-recipe
+// @Description  upload step image. multipart key should be named as "image"
+// @ID upload-step-img
 // @Accept mpfd
 // @Produce json
 // @Param input formData file true "uploaded image"
@@ -190,10 +190,10 @@ func (h *GinHandler) uploadStepImg(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
-// @Summary download recipe images
+// @Summary download step image
 // @Tags recipe image
 // @Description download an image of a recipe
-// @ID download-recipe-imgs
+// @ID download-step-img
 // @Produce json
 // @Success 200  {integer} integer 1
 // @Failure 400,404 {object} ginHandlerError

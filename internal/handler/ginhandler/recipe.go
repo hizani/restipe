@@ -176,7 +176,7 @@ func (h *GinHandler) deleteRecipe(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Tags recipe image
 // @Description  upload recipe image. multipart key should be named as "image"
-// @ID rate-recipe
+// @ID upload-recipe-img
 // @Accept mpfd
 // @Produce json
 // @Param input formData file true "uploaded image"
@@ -241,13 +241,13 @@ func (h *GinHandler) uploadRecipeImg(c *gin.Context) {
 // @Summary download recipe images
 // @Tags recipe image
 // @Description download an image of a recipe
-// @ID download-recipe-imgs
+// @ID download-recipe-img
 // @Produce json
 // @Success 200  {integer} integer 1
 // @Failure 400,404 {object} ginHandlerError
 // @Failure 500 {object} ginHandlerError
 // @failure default {object} ginHandlerError
-// @Router /api/recipes/{id}/images [get]
+// @Router /api/recipes/{id}/image [get]
 func (h *GinHandler) downloadRecipeImg(c *gin.Context) {
 	recipeId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

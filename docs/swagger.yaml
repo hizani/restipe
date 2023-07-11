@@ -309,6 +309,76 @@ paths:
       summary: update recipe
       tags:
       - recipe
+  /api/recipes/{id}/image:
+    get:
+      description: download an image of a recipe
+      operationId: download-recipe-img
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: download recipe images
+      tags:
+      - recipe image
+  /api/recipes/{id}/images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload recipe image. multipart key should be named as "image"
+      operationId: upload-recipe-img
+      parameters:
+      - description: uploaded image
+        in: formData
+        name: input
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: upload recipe image
+      tags:
+      - recipe image
   /api/recipes/{id}/ingredients:
     get:
       description: get all recipe ingredients
@@ -411,7 +481,7 @@ paths:
       summary: remove ingredient
       tags:
       - recipe ingredient
-  /api/recipes/{id}/ingredients/{stepid}:
+  /api/recipes/{id}/ingredients/{number}:
     delete:
       description: remove step from recipe
       operationId: remove-step
@@ -445,8 +515,17 @@ paths:
       - recipe step
   /api/recipes/{id}/rates:
     post:
-      description: download an archive of all recipe images
-      operationId: download-recipe-imgs
+      consumes:
+      - application/json
+      description: rate recipe from 1 to 5
+      operationId: rate-recipe
+      parameters:
+      - description: rate number
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.RateReq'
       produces:
       - application/json
       responses:
@@ -470,7 +549,9 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/ginhandler.ginHandlerError'
-      summary: download recipe images
+      security:
+      - ApiKeyAuth: []
+      summary: rate recipe
       tags:
       - recipe rating
     put:
@@ -584,6 +665,75 @@ paths:
       summary: get steps
       tags:
       - recipe step
+  /api/recipes/{id}/steps/{number}/images:
+    get:
+      description: download an image of a recipe
+      operationId: download-step-img
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: download step image
+      tags:
+      - recipe image
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload step image. multipart key should be named as "image"
+      operationId: upload-step-img
+      parameters:
+      - description: uploaded image
+        in: formData
+        name: input
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: upload step image
+      tags:
+      - recipe image
   /auth/signin:
     post:
       consumes:
