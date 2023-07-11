@@ -48,6 +48,16 @@ func New(service *service.Service) *GinHandler {
 			steps := recipes.Group(":id/steps")
 			{
 				steps.GET("/", h.getAllStepsFromRecipe)
+				images := steps.Group("/:number/images")
+				{
+					images.GET("/", h.downloadStepImg)
+
+				}
+			}
+
+			images := recipes.Group(":id/images")
+			{
+				images.GET("/", h.downloadRecipeImg)
 			}
 
 			auth := recipes.Group("/", h.Authorize)
@@ -65,13 +75,24 @@ func New(service *service.Service) *GinHandler {
 				steps := auth.Group(":id/steps")
 				{
 					steps.POST("/", h.addStepToRecipe)
-					steps.DELETE("/:stepid", h.removeStepFromRecipe)
+					steps.DELETE("/:number", h.removeStepFromRecipe)
+					images := steps.Group("/:number/images")
+					{
+						images.POST("/", h.uploadStepImg)
+
+					}
 				}
 				rates := auth.Group(":id/rates")
 				{
 					rates.POST("/", h.RateRecipe)
 					rates.PUT("/", h.RerateRecipe)
 				}
+
+				images := auth.Group(":id/images")
+				{
+					images.POST("/", h.uploadRecipeImg)
+				}
+
 			}
 
 		}

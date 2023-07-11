@@ -499,6 +499,113 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/recipes/{id}/rates": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "rerate recipe from 1 to 5",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipe rating"
+                ],
+                "summary": "rerate recipe",
+                "operationId": "rate-recipe",
+                "parameters": [
+                    {
+                        "description": "rate number",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "download an archive of all recipe images",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipe rating"
+                ],
+                "summary": "download recipe images",
+                "operationId": "download-recipe-imgs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ginhandler.ginHandlerError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/recipes/{id}/step": {
             "post": {
                 "security": [
@@ -817,9 +924,6 @@ const docTemplate = `{
         },
         "model.GetAllRecipesReq": {
             "type": "object",
-            "required": [
-                "author"
-            ],
             "properties": {
                 "author": {
                     "type": "integer",
@@ -849,6 +953,17 @@ const docTemplate = `{
                 "rating_sort": {
                     "type": "string",
                     "example": "ASC"
+                }
+            }
+        },
+        "model.RateReq": {
+            "type": "object",
+            "required": [
+                "rating"
+            ],
+            "properties": {
+                "rating": {
+                    "type": "integer"
                 }
             }
         },

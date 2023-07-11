@@ -32,6 +32,10 @@ type UpdateRecipeReq struct {
 	Description *string `json:"description"`
 }
 
+type UpdateRecipeImageFilenameReq struct {
+	ImageFilename *string `json:"image_filename"`
+}
+
 type GetAllRecipesReq struct {
 	IngredientFilter []int    `json:"ingredient_filter" example:"1"`
 	DurationFilter   *int64   `json:"duration_filter" example:"7200"`

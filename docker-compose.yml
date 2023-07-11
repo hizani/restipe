@@ -28,3 +28,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - images:/app/images
+
+volumes:
+  images:

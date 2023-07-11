@@ -82,8 +82,13 @@ definitions:
       rating_sort:
         example: ASC
         type: string
+    type: object
+  model.RateReq:
+    properties:
+      rating:
+        type: integer
     required:
-    - author
+    - rating
     type: object
   model.SigninUserReq:
     properties:
@@ -438,6 +443,76 @@ paths:
       summary: remove step
       tags:
       - recipe step
+  /api/recipes/{id}/rates:
+    post:
+      description: download an archive of all recipe images
+      operationId: download-recipe-imgs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      summary: download recipe images
+      tags:
+      - recipe rating
+    put:
+      consumes:
+      - application/json
+      description: rerate recipe from 1 to 5
+      operationId: rate-recipe
+      parameters:
+      - description: rate number
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.RateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/ginhandler.ginHandlerError'
+      security:
+      - ApiKeyAuth: []
+      summary: rerate recipe
+      tags:
+      - recipe rating
   /api/recipes/{id}/step:
     post:
       consumes:

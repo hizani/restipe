@@ -22,10 +22,14 @@ type Recipe interface {
 	GetById(recipeId int) (model.RecipeResp, error)
 	GetAllIngredientsFromRecipe(recipeId int) ([]model.Ingredient, error)
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
-	RemoveStepFromRecipe(userId, recipeId, stepId int) error
+	RemoveStepFromRecipe(userId, recipeId, number int) error
 	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
 	RateRecipe(userId, recipeId int, rating model.RateReq) (int, error)
 	RerateRecipe(userId, recipeId int, rating model.RateReq) error
+	GetRecipeImgFilename(recipeId int) (*string, error)
+	UpdateRecipeImgFilename(userId, recipeId int, filename *string) (*string, error)
+	GetStepImgFilename(recipeId, number int) (*string, error)
+	UpdateStepImgFilename(userId, recipeId, number int, filename *string) (*string, error)
 }
 
 type Service struct {

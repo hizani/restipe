@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"restipe/internal/common"
 	"restipe/internal/handler"
 	"restipe/internal/server"
 	"restipe/internal/service"
@@ -36,6 +37,8 @@ func main() {
 
 		log.Fatalf("can't initialize config: %s", err.Error())
 	}
+
+	common.ImagesPath = viper.GetString("images_path")
 
 	storage, err := storage.NewPostgres(sqldb.Config{
 		Host:     viper.GetString("db.host"),

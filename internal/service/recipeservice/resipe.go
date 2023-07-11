@@ -44,8 +44,8 @@ func (r *RecipeService) AddStepToRecipe(userId, recipeId int, step model.AddStep
 
 }
 
-func (r *RecipeService) RemoveStepFromRecipe(userId, recipeId, stepId int) error {
-	return r.storage.RemoveStepFromRecipe(userId, recipeId, stepId)
+func (r *RecipeService) RemoveStepFromRecipe(userId, recipeId, number int) error {
+	return r.storage.RemoveStepFromRecipe(userId, recipeId, number)
 }
 
 func (r *RecipeService) RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error {
@@ -73,4 +73,35 @@ func (r *RecipeService) RerateRecipe(userId, recipeId int, rating model.RateReq)
 		return errors.New("rating should be >=1 and <=5")
 	}
 	return r.storage.RerateRecipe(userId, recipeId, rating)
+}
+
+func (r *RecipeService) GetRecipeImgFilename(recipeId int) (*string, error) {
+	filename, err := r.storage.GetRecipeImgFilename(recipeId)
+	if err != nil {
+		return filename, err
+	}
+	if filename == nil || *filename == "" {
+		return filename, errors.New("recipe has no image")
+	}
+	return filename, err
+}
+
+func (r *RecipeService) UpdateRecipeImgFilename(userId, recipeId int, filename *string) (*string, error) {
+	return r.storage.UpdateRecipeImgFilename(userId, recipeId, filename)
+
+}
+
+func (r *RecipeService) GetStepImgFilename(recipeId, number int) (*string, error) {
+	filename, err := r.storage.GetStepImgFilename(recipeId, number)
+	if err != nil {
+		return filename, err
+	}
+	if filename == nil || *filename == "" {
+		return filename, errors.New("step has no image")
+	}
+	return filename, err
+}
+
+func (r *RecipeService) UpdateStepImgFilename(userId, recipeId, number int, filename *string) (*string, error) {
+	return r.storage.UpdateStepImgFilename(userId, recipeId, number, filename)
 }

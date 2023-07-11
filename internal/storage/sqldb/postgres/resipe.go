@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"restipe/internal/model"
 	"strings"
@@ -342,35 +343,20 @@ func (r *RecipeStorage) AddIngredientToRecipe(userId int, recipeId int, ingredie
 	return id, tx.Commit()
 }
 
-func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error {
+func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, number int) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
 	}
 
-	var author int
-	SelectRecipeAuthor := fmt.Sprintf(
-		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
-		userTable, recipeTable,
-	)
-	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
-	if err := row.Scan(&author); err != nil {
-		if err != sql.ErrNoRows {
-			tx.Rollback()
-			return err
-		}
-		return nil
-	}
-
-	var number int
-	GetRemovedNumber := fmt.Sprintf(
-		"SELECT number FROM %s WHERE recipe_id = $1 AND id = $2",
-		stepTable,
-	)
-	row = tx.QueryRow(GetRemovedNumber, recipeId, stepId)
-	if err := row.Scan(&number); err != nil {
-		tx.Rollback()
+	var checkUser int
+	checkQuery := fmt.Sprintf("SELECT author FROM %s where id = $1", recipeTable)
+	checkRow := r.db.QueryRow(checkQuery, recipeId)
+	if err := checkRow.Scan(&checkUser); err != nil {
 		return err
+	}
+	if checkUser != userId {
+		return errors.New("not an owner")
 	}
 
 	UpdateStepsNumber := fmt.Sprintf(
@@ -384,10 +370,10 @@ func (r *RecipeStorage) RemoveStepFromRecipe(userId, recipeId, stepId int) error
 	}
 
 	RemoveStepQuery := fmt.Sprintf(
-		"DELETE FROM %s WHERE recipe_id = $1 AND id = $2",
+		"DELETE FROM %s WHERE recipe_id = $1 AND number = $2",
 		stepTable,
 	)
-	if _, err := tx.Exec(RemoveStepQuery, recipeId, stepId); err != nil {
+	if _, err := tx.Exec(RemoveStepQuery, recipeId, number); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -401,18 +387,14 @@ func (r *RecipeStorage) RemoveIngredientFromRecipe(userId, recipeId, ingredientI
 		return err
 	}
 
-	var author int
-	SelectRecipeAuthor := fmt.Sprintf(
-		"SELECT r.author FROM %s u JOIN %s r ON u.id = r.author WHERE r.id = $1 AND u.id = $2",
-		userTable, recipeTable,
-	)
-	row := tx.QueryRow(SelectRecipeAuthor, recipeId, userId)
-	if err := row.Scan(&author); err != nil {
-		if err != sql.ErrNoRows {
-			tx.Rollback()
-			return err
-		}
-		return nil
+	var checkUser int
+	checkQuery := fmt.Sprintf("SELECT author FROM %s where id = $1", recipeTable)
+	checkRow := r.db.QueryRow(checkQuery, recipeId)
+	if err := checkRow.Scan(&checkUser); err != nil {
+		return err
+	}
+	if checkUser != userId {
+		return errors.New("not an owner")
 	}
 
 	RemoveIngredientQuery := fmt.Sprintf(
@@ -444,6 +426,63 @@ func (r *RecipeStorage) RerateRecipe(userId, recipeId int, rating model.RateReq)
 	)
 	_, err := r.db.Exec(query, rating.Rating, userId, recipeId)
 	return err
+}
+
+func (r *RecipeStorage) GetRecipeImgFilename(recipeId int) (*string, error) {
+	var filename *string
+	query := fmt.Sprintf(
+		"SELECT image FROM %s WHERE id = $1",
+		recipeTable,
+	)
+	row := r.db.QueryRow(query, recipeId)
+	err := row.Scan(&filename)
+	return filename, err
+}
+
+func (r *RecipeStorage) UpdateRecipeImgFilename(userId, recipeId int, filename *string) (*string, error) {
+	var old *string
+	oldQuery := fmt.Sprintf("SELECT image FROM %s WHERE id = $1 AND author = $2",
+		recipeTable)
+	r.db.QueryRow(oldQuery, recipeId, userId).Scan(&old)
+
+	query := fmt.Sprintf("UPDATE %s AS r SET image = $1 WHERE id = $2 AND author = $3",
+		recipeTable)
+	_, err := r.db.Exec(query, filename, recipeId, userId)
+	return old, err
+}
+
+func (r *RecipeStorage) GetStepImgFilename(recipeId, number int) (*string, error) {
+	var filename *string
+	query := fmt.Sprintf(
+		"SELECT image FROM %s WHERE number = $1 AND recipe_id = $2",
+		stepTable,
+	)
+	row := r.db.QueryRow(query, number, recipeId)
+	err := row.Scan(&filename)
+	return filename, err
+}
+
+func (r *RecipeStorage) UpdateStepImgFilename(userId, recipeId, number int, filename *string) (*string, error) {
+	var checkUser int
+	checkQuery := fmt.Sprintf("SELECT author FROM %s WHERE id = $1", recipeTable)
+	checkRow := r.db.QueryRow(checkQuery, recipeId)
+	if err := checkRow.Scan(&checkUser); err != nil {
+		return nil, err
+	}
+	if checkUser != userId {
+		return nil, errors.New("not an owner")
+	}
+
+	var old *string
+	oldQuery := fmt.Sprintf("SELECT image FROM %s WHERE recipe_id = $1 AND number = $2",
+		stepTable)
+	r.db.QueryRow(oldQuery, recipeId, number).Scan(&old)
+
+	query := fmt.Sprintf("UPDATE %s AS st SET image = $1 "+
+		"WHERE number = $2 AND recipe_id = $3",
+		stepTable)
+	_, err := r.db.Exec(query, filename, number, recipeId)
+	return old, err
 }
 
 func (r *RecipeStorage) Close() error {

@@ -1,6 +1,7 @@
 port: "8000"
-
 jwttoken: "_yourprivatejwttoken_"
+images_path: "images"
+
 db:
     username: "postgres"
     password: "postgres"

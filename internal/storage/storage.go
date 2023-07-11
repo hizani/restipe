@@ -23,10 +23,14 @@ type Recipe interface {
 	GetAllStepsFromRecipe(recipeId int) ([]model.Step, error)
 	AddStepToRecipe(userId, recipeId int, step model.AddStepReq) (int, error)
 	AddIngredientToRecipe(userId, recipeId int, ingredient model.AddIngredientReq) (int, error)
-	RemoveStepFromRecipe(userId, recipeId, stepId int) error
+	RemoveStepFromRecipe(userId, recipeId, number int) error
 	RemoveIngredientFromRecipe(userId, recipeId, ingredientId int) error
 	RateRecipe(userId, recipeId int, rating model.RateReq) (int, error)
 	RerateRecipe(userId, recipeId int, rating model.RateReq) error
+	GetRecipeImgFilename(recipeId int) (*string, error)
+	UpdateRecipeImgFilename(userId, recipeId int, filename *string) (*string, error)
+	GetStepImgFilename(recipeId, number int) (*string, error)
+	UpdateStepImgFilename(userId, recipeId, number int, filename *string) (*string, error)
 
 	Close() error
 }
